@@ -3,8 +3,8 @@
 import { NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { Db, MongoClient, ObjectId } from 'mongodb';
-
-export async function GET(request: Request, { params }: { params: { idMovie: string } }): Promise<NextResponse> {
+//{ idMovie: string } 
+export async function GET(request: Request, { params }: { params: any }): Promise<NextResponse> {
   try {
     const client: MongoClient = await clientPromise;
     const db: Db = client.db('sample_mflix');
