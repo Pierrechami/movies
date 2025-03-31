@@ -1,8 +1,9 @@
 import { createSwaggerSpec } from "next-swagger-doc";
+import { schemas } from "@/swagger/components";
 
 export const getApiDocs = async () => {
   const spec = createSwaggerSpec({
-    apiFolder: "app/api",
+    apiFolder: "app/api", 
     definition: {
       openapi: "3.0.0",
       info: {
@@ -17,9 +18,11 @@ export const getApiDocs = async () => {
             bearerFormat: "JWT",
           },
         },
+        schemas,
       },
       security: [],
     },
   });
+
   return spec;
 };
