@@ -12,9 +12,12 @@ export interface ErrorResponse {
   error?: unknown;
 }
 
-export function success<T>(data: T, status = 200) {
-  const response = { status, ...data };
-  return NextResponse.json(response, { status });
+export function success<T>(data: T, status = 200, options?: { headers?: HeadersInit }) {
+  const response = { status, ...data};
+  return NextResponse.json(response, {
+    status,
+    headers: options?.headers,
+  });
 }
 
 export function error(message: string, status = 500, errorDetail?: unknown) {
