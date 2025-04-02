@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 import { connectToDatabase } from "@/utils/mongoose";
 import { Comment } from "@/models/Comment";
@@ -166,37 +166,33 @@ import { error, success } from "@/utils/responses";
  */
 
 export async function GET(
-    _req: Request,
-    { params }: { params: { idMovie: string; idComment: string } }
-): Promise<NextResponse> {
-    try {
-        await connectToDatabase();
-
-        if (!mongoose.Types.ObjectId.isValid(params.idMovie) || !mongoose.Types.ObjectId.isValid(params.idComment)) {
-            return error("Invalid movie ID or comment ID", 400);
-        }
-
-        const comment = await Comment.findOne({ _id: params.idComment, movie_id: params.idMovie }).lean();
-
-        if (!comment) {
-            return error("Comment not found", 404);
-
-        }
-
-        return success({ data: comment });
-    } catch (err: any) {
-        return error("Internal Server Error", 500, err.message);
+    req: Request,
+    context:  { params: Promise<{ idMovie: string; idComment: string }> }
+  ): Promise<NextResponse> {
+    const { idMovie, idComment } = await context.params;
+  
+    await connectToDatabase();
+  
+    if (!mongoose.Types.ObjectId.isValid(idMovie) || !mongoose.Types.ObjectId.isValid(idComment)) {
+      return error("Invalid movie ID or comment ID", 400);
     }
-}
+  
+    const comment = await Comment.findOne({ _id: idComment, movie_id: idMovie }).lean();
+    if (!comment) {
+      return error("Comment not found", 404);
+    }
+  
+    return success({ data: comment });
+  }
 
 export async function PUT(
     req: Request,
-    { params }: { params: { idMovie: string; idComment: string } }
+     params : { params: Promise<{ idMovie: string; idComment: string }> }
 ): Promise<NextResponse> {
     try {
         await connectToDatabase();
 
-        if (!mongoose.Types.ObjectId.isValid(params.idMovie) || !mongoose.Types.ObjectId.isValid(params.idComment)) {
+        if (!mongoose.Types.ObjectId.isValid((await params.params).idMovie) || !mongoose.Types.ObjectId.isValid((await params.params).idComment)) {
             return error("Invalid movie ID or comment ID", 400);
         }
 
@@ -207,7 +203,7 @@ export async function PUT(
         }
 
         const updatedComment = await Comment.findOneAndUpdate(
-            { _id: params.idComment, movie_id: params.idMovie },
+            { _id: (await params.params).idComment, movie_id: (await params.params).idMovie },
             { $set: result.data },
             { new: true }
         );
@@ -224,16 +220,16 @@ export async function PUT(
 
 export async function DELETE(
     _req: Request,
-    { params }: { params: { idMovie: string; idComment: string } }
+    { params } : { params: Promise<{ idMovie: string; idComment: string }> }
 ): Promise<NextResponse> {
     try {
         await connectToDatabase();
 
-        if (!mongoose.Types.ObjectId.isValid(params.idMovie) || !mongoose.Types.ObjectId.isValid(params.idComment)) {
+        if (!mongoose.Types.ObjectId.isValid((await params).idMovie) || !mongoose.Types.ObjectId.isValid((await params).idComment)) {
             return error("Invalid movie ID or comment ID", 400);
         }
 
-        const deletedComment = await Comment.findOneAndDelete({ _id: params.idComment, movie_id: params.idMovie });
+        const deletedComment = await Comment.findOneAndDelete({ _id: (await params).idComment, movie_id: (await params).idMovie });
 
         if (!deletedComment) {
             return error("Comment not found for deletion", 404);

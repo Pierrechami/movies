@@ -112,16 +112,16 @@ import { MovieType } from "@/types/movie";
 
 export async function GET(
     _req: Request,
-    { params }: { params: { idMovie: string } }
+    { params }: { params: Promise<{ idMovie: string}> }
   ): Promise<NextResponse> {
     try {
       await connectToDatabase();
   
-      if (!mongoose.Types.ObjectId.isValid(params.idMovie)) {
+      if (!mongoose.Types.ObjectId.isValid((await params).idMovie)) {
         return error("Invalid movie ID", 400);
       }
 
-      const movie = await Movie.findById(params.idMovie).lean() as MovieType | null;
+      const movie = await Movie.findById((await params).idMovie).lean() as MovieType | null;
   
       if (!movie) {
         return error("Movie not found", 404);
@@ -140,12 +140,12 @@ export async function GET(
 
   export async function PUT(
     req: Request,
-    { params }: { params: { idMovie: string } }
+    { params }: { params: Promise<{ idMovie: string}> }
   ): Promise<NextResponse> {
     try {
       await connectToDatabase();
   
-      if (!mongoose.Types.ObjectId.isValid(params.idMovie)) {
+      if (!mongoose.Types.ObjectId.isValid((await params).idMovie)) {
         return error("Invalid movie ID", 400);
       }
   
@@ -156,7 +156,7 @@ export async function GET(
       }
   
       const updatedMovie = await Movie.findByIdAndUpdate(
-        params.idMovie,
+        (await params).idMovie,
         result.data,
         { new: true, lean: true }
       ) as MovieType | null;
@@ -181,16 +181,16 @@ export async function GET(
 
 export async function DELETE(
   _req: Request,
-  { params }: { params: { idMovie: string } }
+  { params }: { params: Promise<{ idMovie: string}> }
 ): Promise<NextResponse> {
   try {
     await connectToDatabase();
 
-    if (!mongoose.Types.ObjectId.isValid(params.idMovie)) {
+    if (!mongoose.Types.ObjectId.isValid((await params).idMovie)) {
       return error("Invalid movie ID", 400);
     }
 
-    const deleted = await Movie.findByIdAndDelete(params.idMovie);
+    const deleted = await Movie.findByIdAndDelete((await params).idMovie);
 
     if (!deleted) {
       return error("Movie not found", 404, "ID not found");

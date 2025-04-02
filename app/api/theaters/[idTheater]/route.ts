@@ -166,16 +166,16 @@ import { theaterInputSchema } from "@/schemas/theaterSchema";
  */
 export async function GET(
     _req: Request,
-    { params }: { params: { idTheater: string } }
+    { params }: { params: Promise<{ idTheater: string}> }
 ): Promise<NextResponse> {
     try {
         await connectToDatabase();
 
-        if (!mongoose.Types.ObjectId.isValid(params.idTheater)) {
+        if (!mongoose.Types.ObjectId.isValid((await params).idTheater)) {
             return error("Invalid theater ID", 400);
         }
 
-        const theater = await Theater.findById(params.idTheater).lean();
+        const theater = await Theater.findById((await params).idTheater).lean();
 
         if (!theater) {
             return error("Theater not found", 404);
@@ -189,12 +189,12 @@ export async function GET(
 
 export async function PUT(
     req: Request,
-    { params }: { params: { idTheater: string } }
+    { params }: { params: Promise<{ idTheater: string}> }
 ): Promise<NextResponse> {
     try {
         await connectToDatabase();
 
-        if (!mongoose.Types.ObjectId.isValid(params.idTheater)) {
+        if (!mongoose.Types.ObjectId.isValid((await params).idTheater)) {
             return error("Invalid theater ID", 400);
         }
 
@@ -205,7 +205,7 @@ export async function PUT(
         }
 
         const updatedTheater = await Theater.findByIdAndUpdate(
-            params.idTheater,
+            (await params).idTheater,
             { $set: result.data },
             { new: true }
         );
@@ -225,16 +225,16 @@ export async function PUT(
 
 export async function DELETE(
     _req: Request,
-    { params }: { params: { idTheater: string } }
+    { params }: { params: Promise<{ idTheater: string}> }
 ): Promise<NextResponse> {
     try {
         await connectToDatabase();
 
-        if (!mongoose.Types.ObjectId.isValid(params.idTheater)) {
+        if (!mongoose.Types.ObjectId.isValid((await params).idTheater)) {
             return error("Invalid theater ID", 400);
         }
 
-        const deletedTheater = await Theater.findByIdAndDelete(params.idTheater);
+        const deletedTheater = await Theater.findByIdAndDelete((await params).idTheater);
 
         if (!deletedTheater) {
             return error("Theater not found for deletion", 404);

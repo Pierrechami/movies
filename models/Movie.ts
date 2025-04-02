@@ -1,6 +1,5 @@
 import mongoose, { Schema } from "mongoose";
 
-// 👇 On exporte le schema pour pouvoir l'importer ailleurs
 export const movieSchema = new Schema({
   title: { type: String, default: null },
   plot: { type: String, default: null },

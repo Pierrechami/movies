@@ -105,16 +105,16 @@ import { error, success } from "@/utils/responses";
 
 export async function GET(
     _req: Request,
-    { params }: { params: { idMovie: string } }
+    { params } : { params: Promise<{ idMovie: string}> }
 ): Promise<NextResponse> {
     try {
         await connectToDatabase();
 
-        if (!mongoose.Types.ObjectId.isValid(params.idMovie)) {
+        if (!mongoose.Types.ObjectId.isValid((await params).idMovie)) {
             return error("Invalid movie ID", 400);
         }
 
-        const comments = await Comment.find({ movie_id: params.idMovie }).lean();
+        const comments = await Comment.find({ movie_id: (await params).idMovie }).lean();
         return success({ data: comments });
     } catch (err: any) {
         return error("Internal Server Error", 500, err.message);
@@ -123,12 +123,12 @@ export async function GET(
 
 export async function POST(
     req: Request,
-    { params }: { params: { idMovie: string } }
+    { params } : { params: Promise<{ idMovie: string}> }
 ): Promise<NextResponse> {
     try {
         await connectToDatabase();
 
-        if (!mongoose.Types.ObjectId.isValid(params.idMovie)) {
+        if (!mongoose.Types.ObjectId.isValid((await params).idMovie)) {
             return error("Invalid movie ID", 400);
         }
 
@@ -140,7 +140,7 @@ export async function POST(
 
         const newComment = await Comment.create({
             ...result.data,
-            movie_id: params.idMovie,
+            movie_id: (await params).idMovie,
         });
 
         return success({ message: "Comment added", data: newComment }, 201);
