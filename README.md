@@ -1,83 +1,137 @@
-## Example app using MongoDB
+# 🎬 Movie API - Fullstack Application with Next.js, MongoDB & JWT Auth
 
-[MongoDB](https://www.mongodb.com/) is a general purpose, document-based, distributed database built for modern application developers and for the cloud era. This example will show you how to connect to and use MongoDB as your backend for your Next.js app.
+Bienvenue dans le projet **Movie API**, une API RESTful développée avec **Next.js**, **MongoDB**, **Mongoose** et **Zod** pour la validation. Elle est déployée sur **Vercel** et intègre un système complet d'authentification avec **JWT**.
 
-If you want to learn more about MongoDB, visit the following pages:
+---
 
-- [MongoDB Atlas](https://mongodb.com/atlas)
-- [MongoDB Documentation](https://docs.mongodb.com/)
+## 🚀 Démo en ligne
 
-## Deploy your own
+🔗 [movie-api.vercel.app](https://movies-sage-kappa.vercel.app/)
 
-Once you have access to the environment variables you'll need, deploy the example using [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=next-example) or preview live with [StackBlitz](https://stackblitz.com/github/vercel/next.js/tree/canary/examples/with-mongodb)
+---
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?project-name=with-mongodb&repository-name=with-mongodb&repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-mongodb&integration-ids=oac_jnzmjqM10gllKmSrG0SGrHOH)
+## 🧱 Stack technique
 
-## How to use
+- **Next.js** 14 (App Router)
+- **TypeScript**
+- **MongoDB** (via MongoDB Atlas)
+- **Mongoose**
+- **Zod** (validation de schémas)
+- **Swagger** (documentation de l'API)
+- **JWT** (authentification avec token)
+- **Tailwind CSS** (si besoin de front-office)
+- **Vercel** (déploiement cloud)
 
-Execute [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [npm](https://docs.npmjs.com/cli/init), [Yarn](https://yarnpkg.com/lang/en/docs/cli/create/), or [pnpm](https://pnpm.io) to bootstrap the example:
+---
 
-```bash
-npx create-next-app --example with-mongodb with-mongodb-app
+## 📁 Architecture du projet
+
+```
+app/
+  api/
+    auth/
+      login/route.ts
+      logout/route.ts
+      register/route.ts
+      refresh-token/route.ts
+    movies/
+      [idMovie]/route.ts
+      [idMovie]/comments/
+        route.ts
+        [idComment]/route.ts
+    theaters/
+      route.ts
+      [idTheater]/route.ts
+models/
+  Movie.ts
+  Comment.ts
+  Theater.ts
+  User.ts
+  Session.ts
+schemas/
+  movieSchema.ts
+  commentSchema.ts
+  userSchema.ts
+services/
+  auth.service.ts
+utils/
+  mongoose.ts
+  responses.ts
+swagger/
+  components.ts
 ```
 
-```bash
-yarn create next-app --example with-mongodb with-mongodb-app
-```
+---
+
+## 🔐 Authentification JWT
+
+Le système d'authentification utilise **accessToken** (valide 1h) et **refreshToken** (valide 7 jours) stocké en base de données dans la collection `sessions`.
+
+Routes disponibles :
+
+- `POST /api/auth/register` : Enregistrement d'un utilisateur
+- `POST /api/auth/login` : Connexion avec génération de token
+- `POST /api/auth/logout` : Suppression de la session
+- `POST /api/auth/refresh-token` : Régénération d'un nouveau token
+
+---
+
+## 📦 Installation en local
 
 ```bash
-pnpm create next-app --example with-mongodb with-mongodb-app
-```
-
-## Configuration
-
-### Set up a MongoDB database
-
-Set up a MongoDB database either locally or with [MongoDB Atlas for free](https://mongodb.com/atlas).
-
-### Set up environment variables
-
-Copy the `env.local.example` file in this directory to `.env.local` (which will be ignored by Git):
-
-```bash
+git clone https://github.com/votre-utilisateur/movie-api.git
+cd movie-api
 cp .env.local.example .env.local
 ```
 
-Set each variable on `.env.local`:
+Ajoutez vos variables d'environnement dans `.env.local` :
 
-- `MONGODB_URI` - Your MongoDB connection string. If you are using [MongoDB Atlas](https://mongodb.com/atlas) you can find this by clicking the "Connect" button for your cluster.
+```env
+MONGODB_URI=mongodb+srv://...
+JWT_SECRET=votre_clé_secrète
+```
 
-### Run Next.js in development mode
+Ensuite, lancez l'application :
 
 ```bash
 npm install
 npm run dev
-# or
-yarn install
-yarn dev
-# or
-pnpm install
-pnpm dev
 ```
 
-Your app should be up and running on [http://localhost:3000](http://localhost:3000)! If it doesn't work, post on [GitHub discussions](https://github.com/vercel/next.js/discussions).
+L'application tourne sur [http://localhost:3000](http://localhost:3000)
 
-You will either see a message stating "You are connected to MongoDB" or "You are NOT connected to MongoDB". Ensure that you have provided the correct `MONGODB_URI` environment variable.
+---
 
-When you are successfully connected, you can refer to the [MongoDB Node.js Driver docs](https://mongodb.github.io/node-mongodb-native/3.4/tutorials/collections/) for further instructions on how to query your database.
+## 📘 Documentation Swagger
 
-## Deploy on Vercel
+Swagger est intégré automatiquement sur la route :
 
-You can deploy this app to the cloud with [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=next-example) ([Documentation](https://nextjs.org/docs/deployment)).
+```
+GET /api-doc
+```
 
-#### Deploy Your Local Project
+Vous y trouverez :
+- Les routes détaillées
+- Les modèles `Movie`, `Comment`, `User`, `Theater`
+- Les schémas d'erreur standardisés
 
-To deploy your local project to Vercel, push it to GitHub/GitLab/Bitbucket and [import to Vercel](https://vercel.com/new?utm_source=github&utm_medium=readme&utm_campaign=next-example).
+---
 
-**Important**: When you import your project on Vercel, make sure to click on **Environment Variables** and set them to match your `.env.local` file.
+## ☁️ Architecture Cloud
 
-#### Deploy from Our Template
+Le projet est déployé sur [**Vercel**](https://vercel.com) avec les configurations suivantes :
 
-Alternatively, you can deploy using our template by clicking on the Deploy button below.
+- CI/CD automatique depuis GitHub
+- Variables d'environnement gérées depuis le dashboard Vercel
+- MongoDB Atlas comme base distante
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?project-name=with-mongodb&repository-name=with-mongodb&repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-mongodb&integration-ids=oac_jnzmjqM10gllKmSrG0SGrHOH)
+---
+
+## 📜 Licence
+
+Projet open-source, vous pouvez le réutiliser ou l'améliorer librement.
+
+---
+
+Merci d'avoir exploré ce projet ! 🎉
+
